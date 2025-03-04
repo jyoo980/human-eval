@@ -1,7 +1,7 @@
 import contextlib
 import faulthandler
 import io
-import multiprocessing
+import multiprocess
 import os
 import platform
 import signal
@@ -71,10 +71,10 @@ def check_correctness(
         the results later even if execution finishes asynchronously.
     """
 
-    manager = multiprocessing.Manager()
+    manager = multiprocess.Manager()
     result = manager.list()
 
-    p = multiprocessing.Process(target=unsafe_execute, args=(problem, completion, timeout, result))
+    p = multiprocess.Process(target=unsafe_execute, args=(problem, completion, timeout, result))
     p.start()
     p.join(timeout=timeout + 1)
     if p.is_alive():
