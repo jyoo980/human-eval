@@ -1,0 +1,5 @@
+# Do not commit caches.
+**/*__pycache__
+
+# Do not commit uncompressed .jsonl files.
+**/*.jsonl
