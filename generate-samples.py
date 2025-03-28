@@ -4,6 +4,15 @@ from openai import OpenAI
 import argparse
 import sys
 
+# This script consumes a .jsonl file that contains a JSON object, which has a
+# 'prompt' key that maps to a prompt for a task.
+#
+# It sends the prompt over to an LLM hosted via an external API and records its
+# response (usually a completion to programming task) to a .jsonl file.
+#
+# Example usage:
+# python generate-samples.py --tasks some-task-prompt.jsonl
+
 CODE_GENERATION_SYSTEM_PROMPT = """
 Given a Python method with a docstring, generate only the completion for the
 method. That is, do not repeat any of the method signature or docstring;
