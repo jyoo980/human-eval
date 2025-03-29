@@ -51,7 +51,7 @@ def _sample_file_name(task_file_name: str) -> str:
     return task_file_name.replace("prompt.jsonl", "samples.jsonl")
 
 
-def _generate_one_completion(prompt: str) -> str:
+def _generate_one_sample(prompt: str) -> str:
     """Sends a code completion prompt over to a language model and returns its
     response.
 
@@ -91,7 +91,10 @@ tasks = read_problems(args.tasks)
 samples = [
     dict(
         task_id=task_id,
-        completion=_generate_one_completion(tasks[task_id]["prompt"]),
+        # The OpenAI evaluation harness expects a 'completion' rather than a
+        # 'sample', which is why the result of `_generate_one_sample` is assigned
+        # to a 'completion' key.
+        completion=_generate_one_sample(tasks[task_id]["prompt"]),
     )
     for task_id in tasks
     for _ in range(NUM_SAMPLES_PER_TASK)
