@@ -10,6 +10,10 @@ import sys
 # It sends the prompt over to an LLM hosted via an external API and records its
 # response (usually a completion to programming task) to another .jsonl file.
 #
+# A note on naming: The OpenAI HumanEval task harness expects specific file
+# names for files that contain responses from language models (e.g.,
+# -samples.jsonl).
+#
 # Example usage:
 # python generate-samples.py --tasks some-task-prompt.jsonl
 
