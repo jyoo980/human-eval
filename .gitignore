@@ -3,3 +3,6 @@
 
 # Do not commit uncompressed .jsonl files.
 **/*.jsonl
+
+# Misc
+.DS_Store
