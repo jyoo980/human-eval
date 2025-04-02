@@ -21,19 +21,32 @@ from human_eval.evaluation import evaluate_functional_correctness
 # python run-correctness-checks.py
 
 
-TASK_DIRECTORY_PATTERN = r"humaneval\d"
-# Much simpler to use the code below once we have the full set of tasks
-# NUM_HUMANEVAL_TASKS = 164
-# TASK_DIRS = [f"humaneval{i}" for i in range(NUM_HUMANEVAL_TASKS)]
-TASK_DIRS = [
-    directory
-    for directory in glob.glob("humaneval*")
-    if re.match(TASK_DIRECTORY_PATTERN, directory)
-]
+def _get_task_directories() -> list[str]:
+    """Returns the names of the directories containing sample and solution files
+    for the HumanEval dataset.
 
-TAGS = ["DESCRIPTION", "INPUTS", "OUTPUT", "EXAMPLES"]
-TAG_PERMUTATIONS = list(permutations(TAGS))
-PERMUTATION_FILE_PREFIXES = ["-".join(perm) for perm in TAG_PERMUTATIONS]
+    TODO: Re-implement this function later as
+    ```python
+    num_tasks = 164
+    return [f"humaneval{i}" for i in range(num_tasks)]
+    ```
+    Once samples have been generated for all 164 tasks in the HumanEval dataset.
+
+    Returns:
+        list[str]: A list of the names of the directories containing sample and
+        solution files for the HumanEval dataset.
+    """
+    task_directory_pattern = r"humaneval\d"
+    dirs_prepended_with_humaneval = glob.glob("humaneval*")
+    return [
+        d for d in dirs_prepended_with_humaneval if re.match(task_directory_pattern, d)
+    ]
+
+
+def _get_tag_permutation_file_prefixes() -> list[str]:
+    tags = ["DESCRIPTION", "INPUTS", "OUTPUT", "EXAMPLES"]
+    tag_permutations = list(permutations(tags))
+    return ["-".join(perm) for perm in tag_permutations]
 
 
 def _run_correctness_check(task_directory: str):
@@ -46,20 +59,25 @@ def _run_correctness_check(task_directory: str):
         task_directory (str): The directory containing the sample files for
         which to run the HumanEval test harness.
     """
+    permutation_file_prefixes = _get_tag_permutation_file_prefixes()
     sample_files = [
         # Sample file names are currently in this ugly format ending in
         # '-prompt.jsonl-samples.jsonl'. generate-samples.py has been updated to
         # avoid this format in the future. For now, we need this for our
         # experiments.
         f"{permutation}-prompt.jsonl-samples.jsonl"
-        for permutation in PERMUTATION_FILE_PREFIXES
+        for permutation in permutation_file_prefixes
     ]
-    solution_files = [f"{perm}-solution.jsonl" for perm in PERMUTATION_FILE_PREFIXES]
+    solution_files = [f"{perm}-solution.jsonl" for perm in permutation_file_prefixes]
+    if len(sample_files) != len(solution_files):
+        print(f"Unequal number of sample files and solution files for {task_directory}")
+        return
     for sample_file, solution_file in zip(sample_files, solution_files):
         evaluate_functional_correctness(
             sample_file=f"{task_directory}/{sample_file}",
             problem_file=f"{task_directory}/{solution_file}",
         )
 
-for task_dir in TASK_DIRS:
+
+for task_dir in _get_task_directories():
     _run_correctness_check(task_dir)

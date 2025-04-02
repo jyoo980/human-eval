@@ -4,11 +4,15 @@ from openai import OpenAI
 import argparse
 import sys
 
-# This script consumes a .jsonl file that contains a JSON object, which has a
-# 'prompt' key that maps to a prompt for a task.
+# This script consumes a .jsonl file in which each line is a JSON object. Each
+# JSON object has a 'prompt' key that maps to a prompt for a task.
 #
 # It sends the prompt over to an LLM hosted via an external API and records its
-# response (usually a completion to programming task) to a .jsonl file.
+# response (usually a completion to programming task) to another .jsonl file.
+#
+# A note on naming: The OpenAI HumanEval task harness expects specific file
+# names for files that contain responses from language models (e.g.,
+# -samples.jsonl).
 #
 # Example usage:
 # python generate-samples.py --tasks some-task-prompt.jsonl
@@ -51,12 +55,14 @@ def _sample_file_name(task_file_name: str) -> str:
     return task_file_name.replace("prompt.jsonl", "samples.jsonl")
 
 
-def _generate_one_completion(prompt: str) -> str:
+def _generate_one_sample(prompt: str) -> str:
     """Sends a code completion prompt over to a language model and returns its
     response.
 
     Args:
-        prompt (str): A prompt containing a code completion task.
+        prompt (str): A prompt that contains at least one method signature and
+        documentation describing its high-level specification, which an LLM is
+        expected to provide a completion for.
 
     Returns:
         str: A language model's response to the given prompt (i.e., code
@@ -82,14 +88,19 @@ if not args.tasks:
     )
     sys.exit(1)
 
-problems = read_problems(args.tasks)
+# Note: The API exposed by the OpenAI test harness refers to prompts/tasks as
+# 'problems'. We discontinue use of that word and instead refer to them as tasks.
+tasks = read_problems(args.tasks)
 
 samples = [
     dict(
         task_id=task_id,
-        completion=_generate_one_completion(problems[task_id]["prompt"]),
+        # The OpenAI evaluation harness expects a 'completion' rather than a
+        # 'sample', which is why the result of `_generate_one_sample` is assigned
+        # to a 'completion' key.
+        completion=_generate_one_sample(tasks[task_id]["prompt"]),
     )
-    for task_id in problems
+    for task_id in tasks
     for _ in range(NUM_SAMPLES_PER_TASK)
 ]
 write_jsonl(_sample_file_name(args.tasks), samples)
