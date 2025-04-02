@@ -65,7 +65,7 @@ def _run_correctness_check(task_directory: str):
         # '-prompt.jsonl-samples.jsonl'. generate-samples.py has been updated to
         # avoid this format in the future. For now, we need this for our
         # experiments.
-        f"{permutation}-prompt.jsonl-samples.jsonl"
+        f"{permutation}-samples.jsonl"
         for permutation in permutation_file_prefixes
     ]
     solution_files = [f"{perm}-solution.jsonl" for perm in permutation_file_prefixes]

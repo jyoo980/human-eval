@@ -15,7 +15,7 @@ import sys
 # -samples.jsonl).
 #
 # Example usage:
-# python generate-samples.py --tasks some-task-prompt.jsonl
+# python generate-samples.py --task some-task-prompt.jsonl
 
 CODE_GENERATION_SYSTEM_PROMPT = """
 Given a Python method with a docstring, generate only the completion for the
@@ -30,10 +30,10 @@ NUM_SAMPLES_PER_TASK = 20
 # Program arguments
 parser = argparse.ArgumentParser()
 parser.add_argument(
-    "--tasks",
-    dest="tasks",
+    "--task",
+    dest="task",
     type=str,
-    help="The .jsonl file comprising code generation tasks",
+    help="The .jsonl file comprising a code generation task",
 )
 
 llm_client = OpenAI()
@@ -82,15 +82,15 @@ def _generate_one_sample(prompt: str) -> str:
 
 
 args = parser.parse_args()
-if not args.tasks:
+if not args.task:
     print(
-        "Please supply a .jsonl file comprising code completion tasks with the '--tasks' flag"
+        "Please supply a .jsonl file comprising a code completion task with the '--task' flag"
     )
     sys.exit(1)
 
 # Note: The API exposed by the OpenAI test harness refers to prompts/tasks as
 # 'problems'. We discontinue use of that word and instead refer to them as tasks.
-tasks = read_problems(args.tasks)
+tasks = read_problems(args.task)
 
 samples = [
     dict(
@@ -103,4 +103,4 @@ samples = [
     for task_id in tasks
     for _ in range(NUM_SAMPLES_PER_TASK)
 ]
-write_jsonl(_sample_file_name(args.tasks), samples)
+write_jsonl(_sample_file_name(args.task), samples)

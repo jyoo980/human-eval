@@ -3,7 +3,7 @@ import re
 import json
 
 from itertools import permutations, combinations
-from tsed.tsed import Calculate
+from tsed.TSED import Calculate
 
 # This script computes the average TSED (Tree Similarity of Edit Distance)
 # score across the samples generated for each tag permutation for a task.
@@ -47,7 +47,7 @@ def _average_score_for_sample(samples: list[str]) -> float:
 
     Args:
         samples (list[str]): A list of samples, which are code completions.
-    
+
     Returns:
         float: The TSED score calculated for the list of samples.
     """
@@ -85,7 +85,7 @@ def _run_syntactic_similarity_checks(task_directory: str):
         # '-prompt.jsonl-samples.jsonl'. generate-samples.py has been updated to
         # avoid this format in the future. For now, we need this for our
         # experiments.
-        f"{task_directory}/{permutation}-prompt.jsonl-samples.jsonl"
+        f"{task_directory}/{permutation}-samples.jsonl"
         for permutation in PERMUTATION_FILE_PREFIXES
     ]
     for sample_file in sample_files:

@@ -32,9 +32,7 @@ TASKS_WITHOUT_EXAMPLES = {38, 41, 83}
 TAGS = ["DESCRIPTION", "INPUTS", "OUTPUT", "EXAMPLES"]
 TAG_PERMUTATIONS = list(permutations(TAGS))
 PERMUTATION_FILE_PREFIXES = ["-".join(perm) for perm in TAG_PERMUTATIONS]
-EXPECTED_SAMPLE_FILES = [
-    f"{perm}-prompt.jsonl-samples.jsonl" for perm in PERMUTATION_FILE_PREFIXES
-]
+EXPECTED_SAMPLE_FILES = [f"{perm}-samples.jsonl" for perm in PERMUTATION_FILE_PREFIXES]
 
 
 def _all_task_dirs_exist() -> bool:
@@ -75,22 +73,23 @@ def _all_samples_present(task_directory: str) -> bool:
     sample_files_to_existence = {
         path: Path(path).exists() for path in sample_file_paths
     }
-    if not all(sample_files_to_existence.values()):
-        task_number = int(re.findall(r"\d+", task_directory)[0])
-        if task_number not in TASKS_WITHOUT_EXAMPLES:
-            return False
-        else:
-            missing_sample_files_for_task = [
-                sample_file
-                for sample_file, does_file_exist in sample_files_to_existence.items()
-                if not does_file_exist
-            ]
-            return all(
-                "EXAMPLES" in missing_sample_file
-                for missing_sample_file in missing_sample_files_for_task
-            )
+    if all(sample_files_to_existence.values()):
+        return True
+    task_number = int(re.findall(r"\d+", task_directory)[0])
+    if task_number not in TASKS_WITHOUT_EXAMPLES:
+        return False
+    else:
+        missing_sample_files_for_task = [
+            sample_file
+            for sample_file, does_file_exist in sample_files_to_existence.items()
+            if not does_file_exist
+        ]
+        return all(
+            "EXAMPLES" in missing_sample_file
+            for missing_sample_file in missing_sample_files_for_task
+        )
 
 
 assert _all_task_dirs_exist()
 for task_dir in TASK_DIRS:
-    assert _all_samples_present(task_dir)
+    assert _all_samples_present(task_dir), f"Missing sample(s) in {task_dir}"
