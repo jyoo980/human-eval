@@ -3,3 +3,9 @@
 
 # Do not commit uncompressed .jsonl files.
 **/*.jsonl
+
+# Do not commit generated sample directories
+humaneval*
+
+# Misc
+.DS_Store
