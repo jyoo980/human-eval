@@ -1,0 +1,3 @@
+[submodule "tsed"]
+	path = tsed
+	url = git@github.com:jyoo980/TSED.git

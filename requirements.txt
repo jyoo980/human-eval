@@ -1,6 +1,10 @@
 tqdm
+openai==1.57.0
 fire
 numpy
 multiprocess>=0.70.17
 ruff
 mypy==1.15.0
+tree-sitter>=0.23.2
+tree-sitter-language-pack>=0.6.1
+apted==1.0.3
