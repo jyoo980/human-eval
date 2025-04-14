@@ -4,3 +4,5 @@ numpy
 multiprocess>=0.70.17
 ruff
 mypy==1.15.0
+openai
+datasets
